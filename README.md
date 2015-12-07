@@ -1,3 +1,3 @@
-# ansible-gpii-flow-manager
+# ansible-flow-manager
 
 Ansible role for Flow Manager
