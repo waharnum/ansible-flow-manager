@@ -13,8 +13,8 @@
     - name: Replace the production Preferences Server's address with a user provided one in a Vagrant environment
       replace:
         dest: '/tmp/{{ item }}'
-        regexp: 'preferences.gpii.net'
-        replace: '{{ flow_manager_preferences_server_host_address }}'
+        regexp: 'https://preferences.gpii.net'
+        replace: 'http://{{ flow_manager_preferences_server_host_address }}'
       notify: Restart the application systemd unit
       with_items:
         - gpii.config.cloudBased.flowManager.production.json
@@ -30,8 +30,8 @@
 - name: Replace the production Preferences Server's address with a user provided one
   replace:
     dest: '{{ nodejs_app_install_dir }}/{{ item.path }}/{{ item.file }}'
-    regexp: 'preferences.gpii.net'
-    replace: '{{ flow_manager_preferences_server_host_address }}'
+    regexp: 'https://preferences.gpii.net'
+    replace: 'http://{{ flow_manager_preferences_server_host_address }}'
   notify: Restart the application systemd unit
   with_items:
     - { path: 'gpii/configs', file: 'gpii.config.cloudBased.flowManager.production.json' }
