@@ -1,18 +1,16 @@
 ---
 # The following workaround is required if VirtualBox Shared Folders are being used on Windows.
-# Without it the Flow Manager configuration file cannot be updated in place with Ansible's
+# Without it the Flow Manager configuration files cannot be updated in place with Ansible's
 # 'replace' module. A "[Errno 26] Text file busy" error will be returned.
 
 - block:
 
-    - name: Copy Flow Manager configuration file to temporary location in a Vagrant environment
+    - name: Copy Flow Manager configuration files to temporary location in a Vagrant environment
       command: cp '{{ nodejs_app_install_dir }}/{{ item.path }}/{{ item.file }}' '/tmp/{{ item.file }}'
       with_items:
         - { path: 'gpii/configs', file: 'gpii.config.cloudBased.flowManager.production.json' }
-        - { path: 'gpii/configs', file: 'gpii.config.cloudBased.production.json' }
-        - { path: 'gpii/node_modules/flowManager/configs', file: 'gpii.flowManager.config.production.json' }
 
-    - name: Replace the production Preferences Server's address with a user provided one
+    - name: Replace the production Preferences Server's address with a user provided one in a Vagrant environment
       replace:
         dest: '/tmp/{{ item }}'
         regexp: 'preferences.gpii.net'
@@ -20,15 +18,11 @@
       notify: Restart the application systemd unit
       with_items:
         - gpii.config.cloudBased.flowManager.production.json
-        - gpii.config.cloudBased.production.json
-        - gpii.flowManager.config.production.json
 
-    - name: Move Flow Manager configuration file back to original location in a Vagrant environment
+    - name: Move Flow Manager configuration files back to original location in a Vagrant environment
       command: mv '/tmp/{{ item.file }}' '{{ nodejs_app_install_dir }}/{{ item.path }}/{{ item.file }}'
       with_items:
         - { path: 'gpii/configs', file: 'gpii.config.cloudBased.flowManager.production.json' }
-        - { path: 'gpii/configs', file: 'gpii.config.cloudBased.production.json' }
-        - { path: 'gpii/node_modules/flowManager/configs', file: 'gpii.flowManager.config.production.json' }
 
   when: is_vagrant
 
@@ -41,5 +35,4 @@
   notify: Restart the application systemd unit
   with_items:
     - { path: 'gpii/configs', file: 'gpii.config.cloudBased.flowManager.production.json' }
-    - { path: 'gpii/configs', file: 'gpii.config.cloudBased.production.json' }
-    - { path: 'gpii/node_modules/flowManager/configs', file: 'gpii.flowManager.config.production.json' }
+  when: not is_vagrant
