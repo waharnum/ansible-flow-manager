@@ -1,15 +1,38 @@
 ---
+# The following workaround is required if VirtualBox Shared Folders are being used on Windows.
+# Without it the Flow Manager configuration files cannot be updated in place with Ansible's
+# 'replace' module. A "[Errno 26] Text file busy" error will be returned.
 
-- name: Update the cloudBased.production config file's Preference Server address
+- block:
+
+    - name: Copy Flow Manager configuration files to temporary location in a Vagrant environment
+      command: cp '{{ nodejs_app_install_dir }}/{{ item.path }}/{{ item.file }}' '/tmp/{{ item.file }}'
+      with_items:
+        - { path: 'gpii/configs', file: 'gpii.config.cloudBased.flowManager.production.json' }
+
+    - name: Replace the production Preferences Server's address with a user provided one in a Vagrant environment
+      replace:
+        dest: '/tmp/{{ item }}'
+        regexp: 'https://preferences.gpii.net'
+        replace: 'http://{{ flow_manager_preferences_server_host_address }}'
+      notify: Restart the application systemd unit
+      with_items:
+        - gpii.config.cloudBased.flowManager.production.json
+
+    - name: Move Flow Manager configuration files back to original location in a Vagrant environment
+      command: mv '/tmp/{{ item.file }}' '{{ nodejs_app_install_dir }}/{{ item.path }}/{{ item.file }}'
+      with_items:
+        - { path: 'gpii/configs', file: 'gpii.config.cloudBased.flowManager.production.json' }
+
+  when: is_vagrant
+
+# If VirtualBox Shared Folders on Windows aren't being used then modify files directly.
+- name: Replace the production Preferences Server's address with a user provided one
   replace:
-    dest: "{{ nodejs_app_install_dir }}/gpii/configs/cloudBased.production.json"
-    regexp: 'http://preferences.gpii.net'
+    dest: '{{ nodejs_app_install_dir }}/{{ item.path }}/{{ item.file }}'
+    regexp: 'https://preferences.gpii.net'
     replace: 'http://{{ flow_manager_preferences_server_host_address }}'
   notify: Restart the application systemd unit
-
-- name: Update flowManager/configs/cloudBased.development.all.local.json config file's Preference Server address
-  replace:
-    dest: "{{ nodejs_app_install_dir }}/gpii/node_modules/flowManager/configs/cloudBased.development.all.local.json"
-    regexp: 'http://localhost:8081/preferences'
-    replace: 'http://{{ flow_manager_preferences_server_host_address }}/preferences'
-  notify: Restart the application systemd unit
+  with_items:
+    - { path: 'gpii/configs', file: 'gpii.config.cloudBased.flowManager.production.json' }
+  when: not is_vagrant
