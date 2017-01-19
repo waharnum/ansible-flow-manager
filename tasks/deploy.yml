@@ -17,12 +17,12 @@
         replace: 'http://{{ flow_manager_preferences_server_host_address }}'
       notify: Restart the application systemd unit
       with_items:
-        - gpii.config.cloudBased.flowManager.production.json
+        - "{{ flow_manager_configuration_file }}"
 
     - name: Move Flow Manager configuration files back to original location in a Vagrant environment
       command: mv '/tmp/{{ item.file }}' '{{ nodejs_app_install_dir }}/{{ item.path }}/{{ item.file }}'
       with_items:
-        - { path: 'gpii/configs', file: 'gpii.config.cloudBased.flowManager.production.json' }
+        - { path: 'gpii/configs', file: "{{ flow_manager_configuration_file }}" }
 
   when: is_vagrant
 
@@ -34,5 +34,5 @@
     replace: 'http://{{ flow_manager_preferences_server_host_address }}'
   notify: Restart the application systemd unit
   with_items:
-    - { path: 'gpii/configs', file: 'gpii.config.cloudBased.flowManager.production.json' }
+    - { path: 'gpii/configs', file: "{{ flow_manager_configuration_file }}" }
   when: not is_vagrant

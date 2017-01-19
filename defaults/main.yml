@@ -3,6 +3,7 @@
 
 flow_manager_preferences_server_host_address: preferences.gpii.net
 flow_manager_environment: cloudBased.production
+flow_manager_configuration_file: gpii.config.cloudBased.production.json
 
 # nodejs application configuration for the ansible-nodejs role
 
