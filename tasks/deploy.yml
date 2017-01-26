@@ -48,4 +48,4 @@
     with_items:
       - { path: 'gpii/node_modules/flowManager/configs', file: "{{ flow_manager_base_configuration_file }}" }
 
-    when: is_vagrant
+  when: not is_vagrant
