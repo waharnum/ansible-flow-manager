@@ -2,8 +2,11 @@
 # defaults file for ansible-gpii-flow-manager
 
 flow_manager_preferences_server_host_address: preferences.gpii.net
-flow_manager_environment: cloudBased.production
-flow_manager_configuration_file: gpii.config.cloudBased.production.json
+flow_manager_environment: gpii.config.cloudBased.flowManager.production
+flow_manager_configuration_file: gpii.config.cloudBased.flowManager.production.json
+
+flow_manager_base_configuration_file: gpii.flowManager.config.base.json
+flow_manager_development_dataStore_baseUrl: localhost
 
 # nodejs application configuration for the ansible-nodejs role
 
@@ -20,7 +23,7 @@ nodejs_app_start_script: gpii.js
 nodejs_app_env_vars:
   - NODE_ENV="{{ flow_manager_environment }}"
 nodejs_app_host_address: 127.0.0.1
-nodejs_app_tcp_port: 8081
+nodejs_app_tcp_port: 8082
 nodejs_app_test_http_endpoint: /carla/settings/%7B%22OS%22:%7B%22id%22:%22linux%22%7D,%22solutions%22:[%7B%22id%22:%22org.gnome.desktop.a11y.magnifier%22%7D]%7D
 nodejs_app_test_http_status_code: 200
 nodejs_app_test_string: org.gnome.desktop.a11y.magnifier

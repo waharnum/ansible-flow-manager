@@ -27,12 +27,25 @@
   when: is_vagrant
 
 # If VirtualBox Shared Folders on Windows aren't being used then modify files directly.
-- name: Replace the production Preferences Server's address with a user provided one
-  replace:
-    dest: '{{ nodejs_app_install_dir }}/{{ item.path }}/{{ item.file }}'
-    regexp: 'https://preferences.gpii.net'
-    replace: 'http://{{ flow_manager_preferences_server_host_address }}'
-  notify: Restart the application systemd unit
-  with_items:
-    - { path: 'gpii/configs', file: "{{ flow_manager_configuration_file }}" }
-  when: not is_vagrant
+
+- block:
+
+  - name: Replace the production Preferences Server's address with a user provided one
+    replace:
+      dest: '{{ nodejs_app_install_dir }}/{{ item.path }}/{{ item.file }}'
+      regexp: 'https://preferences.gpii.net'
+      replace: 'http://{{ flow_manager_preferences_server_host_address }}'
+    notify: Restart the application systemd unit
+    with_items:
+      - { path: 'gpii/configs', file: "{{ flow_manager_configuration_file }}" }
+
+  - name: Replace the development datastore baseUrl (CouchDB instance) with a user-provided one
+    replace:
+      dest: '{{ nodejs_app_install_dir }}/{{ item.path }}/{{ item.file }}'
+      regexp: '"baseUrl": "http://localhost"'
+      replace: '"baseUrl": "http://{{ flow_manager_development_dataStore_baseUrl}}"'
+    notify: Restart the application systemd unit
+    with_items:
+      - { path: 'gpii/node_modules/flowManager/configs', file: "{{ flow_manager_base_configuration_file }}" }
+
+    when: is_vagrant
